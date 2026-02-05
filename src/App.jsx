@@ -8,9 +8,9 @@ function App() {
 
   return (
     <>
-      <p className="read-the-docs">
-       Welcome to Cargo shipping
-      </p>
+      <h1>
+        Welcome to Cargo shipping
+      </h1>
     </>
   )
 }
