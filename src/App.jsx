@@ -90,7 +90,91 @@ const shippingNav = [
   { label: 'Tracking', href: '/#/track', key: 'tracking' },
   { label: 'Services', href: '/#services', key: 'services' },
   { label: 'Partners', href: '/#contact', key: 'partners' },
-  { label: 'Dashboard', href: '/#contact', key: 'dashboard' },
+  { label: 'Dashboard', href: '/#/dashboard', key: 'dashboard' },
+]
+
+const dashboardKpis = [
+  {
+    label: 'Active Shipments',
+    value: '1,248',
+    note: '+12%',
+    icon: 'package_2',
+    tone: 'primary',
+  },
+  {
+    label: "Today's Deliveries",
+    value: '42',
+    note: '18 in transit',
+    icon: 'local_shipping',
+    tone: 'secondary',
+  },
+  {
+    label: 'Pending Quotes',
+    value: '156',
+    note: 'Needs review',
+    icon: 'request_quote',
+    tone: 'tertiary',
+  },
+]
+
+const dashboardShipments = [
+  {
+    id: '#NKH-9283',
+    route: 'Dar es Salaam → Mwanza',
+    shortRoute: 'Dar → Mwanza',
+    customer: 'Bakhresa Group',
+    status: 'In Transit',
+    eta: 'Oct 24, 14:00',
+    tone: 'transit',
+  },
+  {
+    id: '#NKH-8472',
+    route: 'Arusha → Dodoma',
+    shortRoute: 'Arusha → Dodoma',
+    customer: 'Kilimanjaro Fresh',
+    status: 'Delivered',
+    eta: 'Completed',
+    tone: 'delivered',
+  },
+]
+
+const dashboardRuns = [
+  {
+    code: 'TZ-992-AC',
+    driver: 'Hamis Juma',
+    status: 'Running',
+    progress: 75,
+    stops: '4 stops left',
+  },
+]
+
+const dashboardFeed = [
+  {
+    tone: 'alert',
+    label: 'System Alert:',
+    text: 'Delay on A7 Highway. Weather affected.',
+    time: '10m ago',
+  },
+  {
+    tone: 'primary',
+    label: 'Delivered:',
+    text: '#NKH-8472 at Arusha Hub.',
+    time: '1h ago',
+  },
+]
+
+const dashboardSidebarLinks = [
+  { label: 'Overview', icon: 'dashboard', active: true },
+  { label: 'Shipments', icon: 'local_shipping' },
+  { label: 'Inventory', icon: 'inventory_2' },
+  { label: 'Quotes', icon: 'description' },
+]
+
+const dashboardMobileNav = [
+  { label: 'Home', icon: 'dashboard', active: true },
+  { label: 'Shipments', icon: 'local_shipping' },
+  { label: 'Fleet', icon: 'inventory_2' },
+  { label: 'Account', icon: 'person' },
 ]
 
 function getCurrentRoute() {
@@ -98,13 +182,22 @@ function getCurrentRoute() {
     return 'landing'
   }
 
-  return window.location.hash === '#/track' ? 'track' : 'landing'
+  if (window.location.hash === '#/track') {
+    return 'track'
+  }
+
+  if (window.location.hash === '#/dashboard') {
+    return 'dashboard'
+  }
+
+  return 'landing'
 }
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [route, setRoute] = useState(getCurrentRoute)
   const isTrackingPage = route === 'track'
+  const isDashboardPage = route === 'dashboard'
 
   useEffect(() => {
     const syncRoute = () => {
@@ -119,8 +212,14 @@ function App() {
   useEffect(() => {
     document.title = isTrackingPage
       ? 'NatakaHii Cargo | Track Your Shipment'
+      : isDashboardPage
+        ? 'Operations Hub | NatakaHii Cargo'
       : 'NatakaHii Cargo | Reliable City-to-City Delivery'
-  }, [isTrackingPage])
+  }, [isDashboardPage, isTrackingPage])
+
+  if (isDashboardPage) {
+    return <DashboardPage />
+  }
 
   return isTrackingPage ? (
     <ShippingPage isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -526,6 +625,240 @@ function ShippingPage({ isMenuOpen, setIsMenuOpen }) {
   )
 }
 
+function DashboardPage() {
+  return (
+    <div className="dashboard-page">
+      <nav className="dashboard-topbar">
+        <a className="dashboard-topbar__brand" href="/">
+          NatakaHii
+        </a>
+        <div className="dashboard-topbar__actions">
+          <button aria-label="Search dashboard" className="dashboard-icon-button" type="button">
+            <span className="material-symbols-outlined">search</span>
+          </button>
+          <a className="dashboard-book-button" href="/#contact">
+            Book
+          </a>
+        </div>
+      </nav>
+
+      <div className="dashboard-shell">
+        <aside className="dashboard-sidebar">
+          <a className="dashboard-sidebar__brand" href="/">
+            NatakaHii Cargo
+          </a>
+
+          <nav className="dashboard-sidebar__nav">
+            {dashboardSidebarLinks.map((link) => (
+              <a className={link.active ? 'active' : ''} href="/#/dashboard" key={link.label}>
+                <span className="material-symbols-outlined">{link.icon}</span>
+                <span>{link.label}</span>
+              </a>
+            ))}
+          </nav>
+
+          <div className="dashboard-sidebar__bottom">
+            <div className="fleet-load-card">
+              <p>Fleet Load</p>
+              <div className="fleet-load-card__track">
+                <span />
+              </div>
+              <strong>82% Capacity</strong>
+            </div>
+            <a className="dashboard-sidebar__settings" href="/#/dashboard">
+              <span className="material-symbols-outlined">settings</span>
+              <span>Settings</span>
+            </a>
+          </div>
+        </aside>
+
+        <main className="dashboard-main">
+          <header className="dashboard-header">
+            <h1>Operations Hub</h1>
+            <p>Real-time logistics monitoring: Dar-Mwanza Corridor.</p>
+          </header>
+
+          <section className="dashboard-kpis">
+            {dashboardKpis.map((item) => (
+              <article className="dashboard-kpi-card" key={item.label}>
+                <div>
+                  <span>{item.label}</span>
+                  <h2>{item.value}</h2>
+                  <p className={`dashboard-kpi-card__note dashboard-kpi-card__note--${item.tone}`}>
+                    <span className="material-symbols-outlined">
+                      {item.tone === 'primary' ? 'trending_up' : item.tone === 'secondary' ? 'schedule' : 'mail'}
+                    </span>
+                    {item.note}
+                  </p>
+                </div>
+                <div className={`dashboard-kpi-card__icon dashboard-kpi-card__icon--${item.tone}`}>
+                  <span className="material-symbols-outlined">{item.icon}</span>
+                </div>
+              </article>
+            ))}
+          </section>
+
+          <div className="dashboard-grid">
+            <section className="dashboard-shipments-section">
+              <div className="dashboard-section-header">
+                <h3>Recent Shipments</h3>
+                <div className="dashboard-filter-pills">
+                  <button className="active" type="button">
+                    All
+                  </button>
+                  <button type="button">In Transit</button>
+                </div>
+              </div>
+
+              <div className="dashboard-mobile-shipments">
+                {dashboardShipments.map((shipment) => (
+                  <article className="dashboard-shipment-card" key={shipment.id}>
+                    <div className="dashboard-shipment-card__top">
+                      <div>
+                        <span>{shipment.id}</span>
+                        <h4>{shipment.shortRoute}</h4>
+                        <p>{shipment.customer}</p>
+                      </div>
+                      <strong className={`dashboard-status dashboard-status--${shipment.tone}`}>
+                        {shipment.status}
+                      </strong>
+                    </div>
+                    <div className="dashboard-shipment-card__bottom">
+                      <span>{shipment.eta === 'Completed' ? 'Completed' : `ETA: ${shipment.eta}`}</span>
+                      <button type="button">Details →</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="dashboard-table-card">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Route</th>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>ETA</th>
+                      <th aria-label="Actions" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dashboardShipments.map((shipment) => (
+                      <tr key={shipment.id}>
+                        <td>{shipment.id}</td>
+                        <td>{shipment.route}</td>
+                        <td>{shipment.customer}</td>
+                        <td>
+                          <span className={`dashboard-status dashboard-status--${shipment.tone}`}>
+                            {shipment.status}
+                          </span>
+                        </td>
+                        <td>{shipment.eta}</td>
+                        <td>
+                          <span className="material-symbols-outlined">more_vert</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="dashboard-action-grid">
+                <article className="dashboard-monitor-card">
+                  <div>
+                    <h4>Live Map Monitor</h4>
+                    <p>18 vehicles active in Northern Circuit.</p>
+                    <button type="button">Open Monitor →</button>
+                  </div>
+                  <img
+                    alt="Live route monitor preview"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEh_9qcDmSwqtp8-rW_jN7aNGRCnJ5n9Hp86jCqYJtYYy2Zne4RQ-ai4b29Tyy3tH1GjKeJQUIsU4XuHpTZ8YHaCTxxivK4rpFVu329Ss11XudKEElquLZiW-7Czo3ZIyBEAcbzgPfKEeV-agM0JrMZvrYRUUlo5gNKjDttlUqiKMXkjp7-_dC5dbIXZeFkn65k77TiOVoXUONjS4AQ8G76FLBtA9-WjpBL8cZwAnS1hmP2zrCm5QRwHZiGHhJqqEe_ZQHemsZpfw"
+                  />
+                </article>
+
+                <article className="dashboard-alert-card">
+                  <h4>Capacity Alert</h4>
+                  <p>Dar-Arusha route at 95% capacity.</p>
+                  <button type="button">Re-route Shipments</button>
+                </article>
+              </div>
+            </section>
+
+            <aside className="dashboard-side-panel">
+              <section>
+                <h3>Active Runs</h3>
+                <div className="dashboard-runs-list">
+                  {dashboardRuns.map((run) => (
+                    <article className="dashboard-run-card" key={run.code}>
+                      <div className="dashboard-run-card__icon">
+                        <span className="material-symbols-outlined">local_shipping</span>
+                      </div>
+                      <div className="dashboard-run-card__body">
+                        <div className="dashboard-run-card__top">
+                          <h5>{run.code}</h5>
+                          <span>{run.status}</span>
+                        </div>
+                        <p>{run.driver}</p>
+                        <div className="dashboard-run-card__meta">
+                          <strong>{run.progress}%</strong>
+                          <span>{run.stops}</span>
+                        </div>
+                        <div className="dashboard-run-card__progress">
+                          <span style={{ width: `${run.progress}%` }} />
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h3>Recent Feed</h3>
+                <div className="dashboard-feed">
+                  {dashboardFeed.map((item) => (
+                    <article className={`dashboard-feed-item dashboard-feed-item--${item.tone}`} key={`${item.label}-${item.time}`}>
+                      <span />
+                      <div>
+                        <p>
+                          <strong>{item.label}</strong> {item.text}
+                        </p>
+                        <small>{item.time}</small>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <footer className="dashboard-footer">
+        <div>
+          <span>NatakaHii Cargo</span>
+          <p>Kinetic authority and real-time logistics precision across East Africa.</p>
+        </div>
+        <div>
+          <h6>Routes</h6>
+          <p>Dar es Salaam to Mwanza</p>
+          <p>Arusha to Dodoma</p>
+        </div>
+        <p>© 2026 NatakaHii Cargo. All rights reserved.</p>
+      </footer>
+
+      <nav className="dashboard-bottom-nav">
+        {dashboardMobileNav.map((item) => (
+          <button className={item.active ? 'active' : ''} key={item.label} type="button">
+            <span className="material-symbols-outlined">{item.icon}</span>
+            <small>{item.label}</small>
+          </button>
+        ))}
+      </nav>
+    </div>
+  )
+}
+
 function TopNavigation({ activeKey, bookHref, isMenuOpen, menuItems, setIsMenuOpen }) {
   return (
     <>
@@ -645,7 +978,7 @@ function MarketingFooter() {
               <span className="material-symbols-outlined">send</span>
             </button>
           </div>
-          <span className="copyright">© 2024 NatakaHii Cargo.</span>
+          <span className="copyright">© 2026 NatakaHii Cargo.</span>
         </div>
       </div>
     </footer>
