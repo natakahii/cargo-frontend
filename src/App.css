@@ -28,10 +28,12 @@
 
 .brand {
   font-family: var(--font-headline);
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
   font-weight: 800;
   letter-spacing: -0.04em;
+  line-height: 1;
   color: var(--primary-container);
+  white-space: nowrap;
 }
 
 .topbar-links {
@@ -90,6 +92,11 @@
 .btn-primary {
   color: #fff;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+}
+
+.topbar-book-btn {
+  min-height: 46px;
+  padding: 0 24px;
 }
 
 .btn-accent {
@@ -825,6 +832,11 @@
 
   .desktop-only {
     display: inline-flex;
+  }
+
+  .topbar-book-btn {
+    min-height: 44px;
+    padding: 0 22px;
   }
 
   .menu-toggle {
@@ -1605,6 +1617,15 @@
 }
 
 @media (max-width: 640px) {
+  .topbar {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .brand {
+    font-size: 1.05rem;
+  }
+
   .shipping-search__bar input {
     padding: 24px 24px 88px 64px;
     font-size: 1rem;

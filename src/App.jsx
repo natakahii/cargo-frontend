@@ -87,28 +87,40 @@ const shippingTimeline = [
 ]
 
 const shippingNav = [
-  { label: 'Tracking', href: '/track', key: 'tracking' },
+  { label: 'Tracking', href: '/#/track', key: 'tracking' },
   { label: 'Services', href: '/#services', key: 'services' },
   { label: 'Partners', href: '/#contact', key: 'partners' },
   { label: 'Dashboard', href: '/#contact', key: 'dashboard' },
 ]
 
+function getCurrentRoute() {
+  if (typeof window === 'undefined') {
+    return 'landing'
+  }
+
+  return window.location.hash === '#/track' ? 'track' : 'landing'
+}
+
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/'
-  const isTrackingPage = pathname === '/track' || pathname === '/shipping'
+  const [route, setRoute] = useState(getCurrentRoute)
+  const isTrackingPage = route === 'track'
+
+  useEffect(() => {
+    const syncRoute = () => {
+      setRoute(getCurrentRoute())
+      setIsMenuOpen(false)
+    }
+
+    window.addEventListener('hashchange', syncRoute)
+    return () => window.removeEventListener('hashchange', syncRoute)
+  }, [])
 
   useEffect(() => {
     document.title = isTrackingPage
       ? 'NatakaHii Cargo | Track Your Shipment'
       : 'NatakaHii Cargo | Reliable City-to-City Delivery'
   }, [isTrackingPage])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && pathname === '/shipping') {
-      window.history.replaceState({}, '', '/track')
-    }
-  }, [pathname])
 
   return isTrackingPage ? (
     <ShippingPage isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -150,7 +162,7 @@ function LandingPage({ isMenuOpen, setIsMenuOpen }) {
                 <a className="btn btn-accent" href="/#contact">
                   Start Shipping
                 </a>
-                <a className="btn btn-soft" href="/track">
+                <a className="btn btn-soft" href="/#/track">
                   <span className="material-symbols-outlined">track_changes</span>
                   Track Package
                 </a>
@@ -531,7 +543,7 @@ function TopNavigation({ activeKey, bookHref, isMenuOpen, menuItems, setIsMenuOp
         </nav>
 
         <div className="topbar-actions">
-          <a className="btn btn-primary desktop-only" href={bookHref}>
+          <a className="btn btn-primary topbar-book-btn desktop-only" href={bookHref}>
             Book Now
           </a>
           <button
@@ -572,7 +584,11 @@ function TopNavigation({ activeKey, bookHref, isMenuOpen, menuItems, setIsMenuOp
               {item.label}
             </a>
           ))}
-          <a className="btn btn-primary mobile-menu__cta" href={bookHref} onClick={() => setIsMenuOpen(false)}>
+          <a
+            className="btn btn-primary topbar-book-btn mobile-menu__cta"
+            href={bookHref}
+            onClick={() => setIsMenuOpen(false)}
+          >
             Book Now
           </a>
         </div>
@@ -604,7 +620,7 @@ function MarketingFooter() {
             <ul>
               {footerLinks.map((item) => (
                 <li key={item}>
-                  <a href={item === 'Tracking' ? '/track' : '/#services'}>{item}</a>
+                  <a href={item === 'Tracking' ? '/#/track' : '/#services'}>{item}</a>
                 </li>
               ))}
             </ul>
