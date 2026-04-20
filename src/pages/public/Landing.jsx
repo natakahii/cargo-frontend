@@ -11,10 +11,9 @@ export function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className={`cargo-app ${isMenuOpen ? 'menu-open' : ''}`}>
+    <div className={`min-h-screen text-on-surface ${isMenuOpen ? 'mobile-nav-active' : ''}`}>
       <TopNavigation
         activeKey=""
-        bookHref="/#contact"
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
       />
